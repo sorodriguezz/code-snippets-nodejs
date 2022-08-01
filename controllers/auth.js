@@ -34,46 +34,6 @@ exports.signin = async (req, res) => {
   return res.json({ token });
 };
 
-exports.signup = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    const slug = slugify(req.body.username);
-
-    if (username === "" || email === "" || password === "") {
-      return res
-        .status(400)
-        .json({ message: "Todos los campos son requeridos" });
-    }
-
-    const existUsername = await User.findOne({ username });
-    const existEmail = await User.findOne({ email });
-
-    if (existEmail || existUsername) {
-      return res.status(400).json({ message: "Usuario o correo ya existen" });
-    }
-
-    const newUser = new User({
-      username,
-      slug,
-      email,
-      password: await User.encryptPassword(password),
-    });
-
-    const role = await Role.find({ name: "user" });
-    newUser.roles = role[0]._id;
-
-    const savedUser = await newUser.save();
-
-    const token = jwt.sign({ id: savedUser._id }, process.env.SECRET, {
-      expiresIn: 900,
-    });
-
-    res.status(200).json({ token });
-  } catch (err) {
-    res.status(500).json({ err });
-  }
-};
-
 exports.decodeToken = async (req, res, _next) => {
   try {
     const token = req.headers["authorization"];

@@ -9,7 +9,6 @@ exports.createRoles = async () => {
 
     await Promise.all([
       new Role({ name: "user", slug: "user" }).save(),
-      new Role({ name: "moderator", slug: "moderator" }).save(),
       new Role({ name: "admin", slug: "admin" }).save(),
     ]);
 

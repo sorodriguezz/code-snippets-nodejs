@@ -5,7 +5,7 @@ const slugify = require("slugify");
 
 exports.createUser = async (req, res) => {
   try {
-    const { username, email, password, roles } = req.body;
+    const { username, email, password } = req.body;
     const slug = slugify(req.body.username);
 
     const existUsername = await User.findOne({ username });
@@ -22,11 +22,9 @@ exports.createUser = async (req, res) => {
       slug,
       email,
       password,
-      roles,
     });
 
     newUser.password = await User.encryptPassword(password);
-    newUser.roles = await Role.find({ name: roles });
 
     if (newUser.roles.length === 0) {
       newUser.roles = await Role.find({ name: "user" });
@@ -47,7 +45,7 @@ exports.createUser = async (req, res) => {
 
 exports.listUsers = async (_req, res) => {
   try {
-    const users = await User.find({ status: "active" });
+    const users = await User.find({ status: "active" }).populate("roles");
     return res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error });

@@ -11,11 +11,13 @@ exports.verifyToken = async (req, res, next) => {
         
         req.userId = decoded.id;
 
-        const user = await User.findById(req.userId, { password: 0 });
+        const user = await User.findById(req.userId);
+
         if(!user) return res.status(404).json({error: "Usuario no encontrado"});
 
         next();
     } catch (err) {
+        console.log(object);
         return res.status(500).json({err});
     }
 };
@@ -32,32 +34,4 @@ exports.isAdmin = async (req, res, next) => {
     }
 
     return res.status(403).json({error: "No tienes permisos de administrador"});
-};
-
-exports.isModerator = async (req, res, next) => {
-    const user = await User.findById(req.userId);
-    const roles = await Role.find({_id: {$in: user.roles}});
-
-    for (const rol of roles) {
-        if(rol.name === "moderator") {
-            next();
-            return;
-        }
-    }
-    
-    return res.status(403).json({error: "No tienes permisos de moderador"});
-};
-
-exports.isModeratorOrAdmin = async (req, res, next) => {
-    const user = await User.findById(req.userId);
-    const roles = await Role.find({_id: {$in: user.roles}});
-
-    for (const rol of roles) {
-        if(rol.name === "moderator" || rol.name === "admin") {
-            next();
-            return;
-        }
-    }
-    
-    return res.status(403).json({error: "No tienes permisos de moderador o administrador"});
 };
