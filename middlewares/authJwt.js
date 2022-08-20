@@ -7,9 +7,17 @@ exports.verifyToken = async (req, res, next) => {
     try {
         if (!token) return res.status(403).json({error: "No se proporcionó token"});
         
-        const decoded = jwt.verify(token, process.env.SECRET);
+        const { id } = jwt.verify(token, process.env.SECRET, (err, decode) => {
+            if(err){
+                return res.status(401).json({
+                    expiredAt: err.expiredAt,
+                    message: err.message,
+                });
+            }
+            return decode;
+        });
         
-        req.userId = decoded.id;
+        req.userId = id;
 
         const user = await User.findById(req.userId);
 

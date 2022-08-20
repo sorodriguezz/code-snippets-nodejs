@@ -38,6 +38,10 @@ exports.decodeToken = async (req, res, _next) => {
   try {
     const token = req.headers["authorization"];
 
+    if(!token){
+      return res.status(400).json({ mesagge: "No se proporcionó token" });
+    }
+
     const profiles = ["user", "admin", "moderator"];
 
     const decoded = jwt.verify(token, process.env.SECRET, { complete: true });
