@@ -11,6 +11,8 @@ exports.signin = async (req, res) => {
   const userFound = await User.findOne({ email }).populate("roles");
 
   if (!userFound) return res.status(400).json({ message: "User not found" });
+  
+  if(userFound.status === 'inactive') return res.status(400).json({ message: "User inactive" });
 
   const matchPassword = await User.comparePassword(
     password,

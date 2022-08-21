@@ -43,9 +43,23 @@ exports.createUser = async (req, res) => {
   }
 };
 
+exports.userFindBySlug = async (req, res) => {
+  try {
+    const slug = req.params;
+    const user = await User.findOne(slug).populate("roles");
+
+    if(user.status === 'inactive') return res.status(200).json({ message: "User inactive" });
+
+    res.status(200).json({ user });
+  
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+};
+
 exports.listUsers = async (_req, res) => {
   try {
-    const users = await User.find({ status: "active" }).populate("roles");
+    const users = await User.find().populate("roles");
     return res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error });
