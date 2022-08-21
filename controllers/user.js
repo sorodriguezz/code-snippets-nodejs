@@ -57,6 +57,35 @@ exports.userFindBySlug = async (req, res) => {
   }
 };
 
+exports.changeStateUser = async (req, res) => {
+  try {
+    const user = await User.findOne({ slug: req.params.slug });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    if (user.status === "inactive") {
+      const active = await User.findOneAndUpdate(
+        { slug: req.params.slug },
+        { status: "active" },
+        { new: true }
+      );
+      return res.json(active);
+    }
+
+    const inactive = await User.findOneAndUpdate(
+      { slug: req.params.slug },
+      { status: "inactive" },
+      { new: true }
+    );
+    return res.json(inactive);
+
+  } catch (err) {
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
 exports.listUsers = async (_req, res) => {
   try {
     const users = await User.find().populate("roles");
