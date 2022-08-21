@@ -61,6 +61,34 @@ exports.listSnippetsInactive = async (_req, res) => {
   }
 };
 
+exports.listAllSnippets= async (_req, res) => {
+  try {
+    const snippets = await Snippet.find().populate('tags').populate('language');
+    return res.status(200).json(snippets);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json( error );
+  }
+};
+
+exports.removeSoft = async (req, res) => {
+  try {
+    const deleted = await Snippet.findOneAndUpdate(
+      { slug: req.params.slug },
+      { status: "inactive" },
+      { new: true }
+    );
+
+    if(deleted === null) {
+      return res.status(400).json({message: "Snippet not found"});
+    }
+    
+    res.json(deleted);
+  } catch (err) {
+    res.status(400).send("Snippet delete failed");
+  }
+};
+
 exports.remove = async (req, res) => {
   try {
     const deleted = await Snippet.findOneAndRemove({ slug: req.params.slug });
