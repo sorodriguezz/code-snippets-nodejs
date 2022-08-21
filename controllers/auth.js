@@ -1,15 +1,20 @@
 const User = require("../models/user");
-const Role = require("../models/role");
 const jwt = require("jsonwebtoken");
-const slugify = require("slugify");
 
 exports.signin = async (req, res) => {
   const { email, password } = req.body;
+  const rolesUser = [];
 
   if (email === "" || password === "")
     return res.status(400).json({ message: "Todos los campos son requeridos" });
 
   const userFound = await User.findOne({ email }).populate("roles");
+
+
+
+  for(let roles of userFound.roles){
+    rolesUser.push(roles.name);
+  }
 
   if (!userFound) return res.status(400).json({ message: "User not found" });
 
@@ -24,14 +29,22 @@ exports.signin = async (req, res) => {
       .json({ token: null, message: "Contraseña o correo incorrectos" });
 
   const token = jwt.sign(
-    { id: userFound._id, roles: userFound.roles },
+    { 
+      id: userFound._id, 
+      roles: userFound.roles 
+    },
     process.env.SECRET,
     {
-      expiresIn: 900,
+      expiresIn: 3600,
     }
   );
 
-  return res.json({ token });
+  return res.json({ 
+    token, 
+    user: userFound.username,
+    email: userFound.email,
+    roles: rolesUser
+  });
 };
 
 exports.decodeToken = async (req, res, _next) => {
