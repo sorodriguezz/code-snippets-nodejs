@@ -10,12 +10,6 @@ exports.signin = async (req, res) => {
 
   const userFound = await User.findOne({ email }).populate("roles");
 
-
-
-  for(let roles of userFound.roles){
-    rolesUser.push(roles.name);
-  }
-
   if (!userFound) return res.status(400).json({ message: "User not found" });
 
   const matchPassword = await User.comparePassword(
@@ -38,6 +32,10 @@ exports.signin = async (req, res) => {
       expiresIn: 3600,
     }
   );
+
+  for(let roles of userFound.roles){
+    rolesUser.push(roles.name);
+  }
 
   return res.json({ 
     token, 
