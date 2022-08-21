@@ -8,7 +8,9 @@ exports.signin = async (req, res) => {
   if (email === "" || password === "")
     return res.status(400).json({ message: "Todos los campos son requeridos" });
     
-  const userFound = await User.findOne({ email }).populate("roles");
+  const userFound = await User.findOne({ email }).populate({path: "roles", select: 'role name -_id'});
+
+  console.log(userFound);
   if (!userFound) return res.status(400).json({ message: "User not found" });
   
   if(userFound.status === 'inactive') return res.status(400).json({ message: "User inactive" });
