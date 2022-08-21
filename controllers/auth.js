@@ -7,9 +7,8 @@ exports.signin = async (req, res) => {
 
   if (email === "" || password === "")
     return res.status(400).json({ message: "Todos los campos son requeridos" });
-
+    
   const userFound = await User.findOne({ email }).populate("roles");
-
   if (!userFound) return res.status(400).json({ message: "User not found" });
   
   if(userFound.status === 'inactive') return res.status(400).json({ message: "User inactive" });
@@ -26,7 +25,7 @@ exports.signin = async (req, res) => {
 
   const token = jwt.sign(
     { 
-      id: userFound._id, 
+      username: userFound.username, 
       roles: userFound.roles 
     },
     process.env.SECRET,
