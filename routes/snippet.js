@@ -8,7 +8,7 @@ router.post("/snippet", [authJwt.verifyToken], createSnippet);
 router.get("/snippets-actives", listSnippets);
 router.get("/snippets-inactives", listSnippetsInactive);
 router.get("/snippets", [authJwt.verifyToken], listAllSnippets);
-router.patch("/:slug", removeSoft);
-router.delete("/:slug", remove);
+router.patch("/snippets/:slug", removeSoft);
+router.delete("/snippets/:slug", remove);
 
 module.exports = router;
