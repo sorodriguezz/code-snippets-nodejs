@@ -9,28 +9,28 @@ exports.createSnippet = async (req, res) => {
 
     req.body.slug = slugify(title);
 
-    const snippet = await Snippet.findOne({ slug: title});
+    const snippet = await Snippet.findOne({ slug: title });
 
-    if(snippet) {
-      return res.status(400).json({message: "Snippet ya existe"});
+    if (snippet) {
+      return res.status(400).json({ message: "Snippet ya existe" });
     }
 
     req.body.language = await Language.findOne({ slug: language });
 
-    if(req.body.language === null){
-      return res.status(400).json({message: "Lenguaje no encontrado"});
+    if (req.body.language === null) {
+      return res.status(400).json({ message: "Lenguaje no encontrado" });
     }
 
     req.body.tags = await Tag.find({ slug: tags });
 
-    if(req.body.tags === null){
-      return res.status(400).json({message: "Tag no encontrado"});
+    if (req.body.tags === null) {
+      return res.status(400).json({ message: "Tag no encontrado" });
     }
 
     if (!title || !description || !code || !tags || !language) {
       return res
-      .status(400)
-      .json({ message: "Error en los parámetros de entrada" });
+        .status(400)
+        .json({ message: "Error en los parámetros de entrada" });
     }
 
     res.json(await new Snippet(req.body).save());
@@ -41,33 +41,37 @@ exports.createSnippet = async (req, res) => {
 
 exports.listSnippets = async (_req, res) => {
   try {
-    const snippets = await Snippet.find({ status: "active" }).populate('tags').populate('language');
+    const snippets = await Snippet.find({ status: "active" })
+      .populate("tags")
+      .populate("language");
 
     return res.status(200).json(snippets);
   } catch (error) {
     console.log(error);
-    res.status(500).json( error );
+    res.status(500).json(error);
   }
 };
 
 exports.listSnippetsInactive = async (_req, res) => {
   try {
-    const snippets = await Snippet.find({ status: "inactive" }).populate('tags').populate('language');
+    const snippets = await Snippet.find({ status: "inactive" })
+      .populate("tags")
+      .populate("language");
 
     return res.status(200).json(snippets);
   } catch (error) {
     console.log(error);
-    res.status(500).json( error );
+    res.status(500).json(error);
   }
 };
 
-exports.listAllSnippets= async (_req, res) => {
+exports.listAllSnippets = async (_req, res) => {
   try {
-    const snippets = await Snippet.find().populate('tags').populate('language');
+    const snippets = await Snippet.find().populate("tags").populate("language");
     return res.status(200).json(snippets);
   } catch (error) {
     console.log(error);
-    res.status(500).json( error );
+    res.status(500).json(error);
   }
 };
 
@@ -94,10 +98,10 @@ exports.removeSoft = async (req, res) => {
       { new: true }
     );
 
-    if(inactive === null) {
-      return res.status(400).json({message: "Snippet not found"});
+    if (inactive === null) {
+      return res.status(400).json({ message: "Snippet not found" });
     }
-    
+
     return res.json(inactive);
   } catch (err) {
     res.status(400).send("Snippet delete failed");
