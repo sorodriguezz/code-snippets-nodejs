@@ -73,17 +73,32 @@ exports.listAllSnippets= async (_req, res) => {
 
 exports.removeSoft = async (req, res) => {
   try {
-    const deleted = await Snippet.findOneAndUpdate(
+    const snippet = await Snippet.findOne({ slug: req.params.slug });
+
+    if (!snippet) {
+      return res.status(400).json({ message: "Snippet not found" });
+    }
+
+    if (snippet.status === "inactive") {
+      const active = await Snippet.findOneAndUpdate(
+        { slug: req.params.slug },
+        { status: "active" },
+        { new: true }
+      );
+      return res.json(active);
+    }
+
+    const inactive = await Snippet.findOneAndUpdate(
       { slug: req.params.slug },
       { status: "inactive" },
       { new: true }
     );
 
-    if(deleted === null) {
+    if(inactive === null) {
       return res.status(400).json({message: "Snippet not found"});
     }
     
-    res.json(deleted);
+    return res.json(inactive);
   } catch (err) {
     res.status(400).send("Snippet delete failed");
   }
